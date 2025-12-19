@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Eleição Oficial (100% Séria)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 380px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #0056b3; }
+    .result {
+      margin-top: 15px;
+      background: #eee;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Vote no eleito</h1>
+
+    <input type="text" id="usuario" placeholder="Digite seu nome de usuário" />
+
+    <button onclick="votar('Batata')">Batata</button>
+    <button onclick="votar('Pastel')">Pastel</button>
+    <button onclick="votar('Zero')">Zero</button>
+
+    <div class="result" id="resultado"></div>
+    <div class="result">
+      <strong>Quem já votou:</strong>
+      <ul id="listaUsuarios"></ul>
+    </div>
+  </div>
+
+  <script>
+    // ZERA qualquer configuração antiga (Amigo 1, 2, 3)
+    const votosPadrao = {
+      Batata: 0,
+      Pastel: 0,
+      Zero: 0
+    };
+
+    let votos = JSON.parse(localStorage.getItem('votos'));
+    if (!votos || votos['Amigo 1']) {
+      votos = votosPadrao;
+      localStorage.setItem('votos', JSON.stringify(votosPadrao));
+    }
+
+    let usuariosQueVotaram = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+    function votar(candidato) {
+      const usuario = document.getElementById('usuario').value.trim();
+
+      if (!usuario) {
+        alert('Digite seu nome de usuário antes de votar!');
+        return;
+      }
+
+      if (usuariosQueVotaram.includes(usuario)) {
+        alert('Esse usuário já votou!');
+        return;
+      }
+
+      votos[candidato]++;
+      usuariosQueVotaram.push(usuario);
+
+      localStorage.setItem('votos', JSON.stringify(votos));
+      localStorage.setItem('usuarios', JSON.stringify(usuariosQueVotaram));
+
+      document.getElementById('usuario').value = '';
+      mostrarResultado();
+      mostrarUsuarios();
+    }
+
+    function mostrarResultado() {
+      let texto = '<strong>Resultado:</strong><br>';
+      for (let pessoa in votos) {
+        texto += `${pessoa}: ${votos[pessoa]} votos<br>`;
+      }
+      document.getElementById('resultado').innerHTML = texto;
+    }
+
+    function mostrarUsuarios() {
+      const ul = document.getElementById('listaUsuarios');
+      ul.innerHTML = '';
+      usuariosQueVotaram.forEach(u => {
+        const li = document.createElement('li');
+        li.textContent = u;
+        ul.appendChild(li);
+      });
+    }
+
+    mostrarResultado();
+    mostrarUsuarios();
+  </script>
+</body>
+</html>
